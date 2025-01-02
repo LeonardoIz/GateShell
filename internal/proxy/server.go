@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"gateshell/internal/auth"
-	"gateshell/internal/config"
+	"gateshell/internal/utils"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -16,7 +16,7 @@ type ServerConfig struct {
 	HostKeyFile   string
 	ServerName    string
 	ServerVersion string
-	Config        *config.Manager
+	Config        *utils.Manager
 }
 
 type Server struct {
@@ -27,7 +27,6 @@ type Server struct {
 }
 
 func NewServer(config *ServerConfig) *Server {
-	// Create a new Server with the given configuration
 	return &Server{
 		config: config,
 		router: NewRouter(config.Config),

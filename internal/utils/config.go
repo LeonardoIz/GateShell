@@ -1,8 +1,7 @@
-package config
+package utils
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +11,7 @@ const (
 	DefaultConfigFile = "config.json"
 	DefaultPort       = 22
 	DefaultHostKey    = "ssh_host_key"
+	DefaultLogDir     = "logs"
 )
 
 // AuthConfig represents the authentication configuration for an endpoint
@@ -31,6 +31,7 @@ type ServerConfig struct {
 	Port            int    `json:"port"`
 	HostKey         string `json:"host_key"`
 	DefaultEndpoint string `json:"default_endpoint,omitempty"`
+	LogDir          string `json:"log_dir"`
 }
 
 // Config represents the complete configuration
@@ -45,30 +46,11 @@ type Manager struct {
 	config     *Config
 }
 
-// NewManager creates a new configuration manager instance
-func NewManager() *Manager {
+// NewManager creates a new configuration manager instance with the given config file path
+func NewManager(configFile string) *Manager {
 	return &Manager{
-		configFile: getConfigPath(),
+		configFile: configFile,
 	}
-}
-
-// getConfigPath gets the path of the configuration file
-func getConfigPath() string {
-	// Check command line flag
-	configPath := flag.String("config", "", "path to config file")
-	flag.Parse()
-
-	if *configPath != "" {
-		return *configPath
-	}
-
-	// Check environment variable
-	if envPath := os.Getenv("CONFIG_FILE"); envPath != "" {
-		return envPath
-	}
-
-	// Use default value
-	return DefaultConfigFile
 }
 
 // createDefaultConfig creates a default configuration file
@@ -77,6 +59,7 @@ func createDefaultConfig() *Config {
 		Server: ServerConfig{
 			Port:    DefaultPort,
 			HostKey: DefaultHostKey,
+			LogDir:  DefaultLogDir,
 		},
 	}
 }
@@ -146,6 +129,11 @@ func (m *Manager) validateConfig() error {
 	// Validate host key
 	if m.config.Server.HostKey == "" {
 		return fmt.Errorf("host key file path is required")
+	}
+
+	// Validate log directory
+	if m.config.Server.LogDir == "" {
+		return fmt.Errorf("log directory path is required")
 	}
 
 	// Validate endpoints

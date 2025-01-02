@@ -17,7 +17,6 @@ type Authenticator struct {
 }
 
 func NewAuthenticator(config *AuthConfig) *Authenticator {
-	// Create a new Authenticator with the given configuration
 	return &Authenticator{
 		config:     config,
 		keyManager: NewKeyManager(config.HostKeyFile),

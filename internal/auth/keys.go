@@ -15,7 +15,6 @@ type KeyManager struct {
 }
 
 func NewKeyManager(keyPath string) *KeyManager {
-	// Create a new KeyManager with the given key path
 	return &KeyManager{
 		KeyPath: keyPath,
 	}

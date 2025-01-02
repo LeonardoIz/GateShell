@@ -6,17 +6,17 @@ import (
 	"log"
 
 	"gateshell/internal/auth"
-	"gateshell/internal/config"
+	"gateshell/internal/utils"
 
 	"golang.org/x/crypto/ssh"
 )
 
 type Router struct {
 	authenticator *auth.Authenticator
-	config        *config.Manager
+	config        *utils.Manager
 }
 
-func NewRouter(config *config.Manager) *Router {
+func NewRouter(config *utils.Manager) *Router {
 	// Create a new Router with the given configuration
 	return &Router{
 		authenticator: auth.NewAuthenticator(&auth.AuthConfig{}),
