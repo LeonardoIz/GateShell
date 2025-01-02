@@ -1,4 +1,3 @@
-// cmd/gateshell/main.go
 package main
 
 import (
@@ -15,6 +14,7 @@ const (
 )
 
 func PrintBanner() {
+	// Print the server banner with name and version
 	fmt.Printf(`
 %s v%s - A modern reverse proxy for SSH.
 
@@ -24,13 +24,16 @@ func PrintBanner() {
 func main() {
 	PrintBanner()
 
-	// Cargar configuración
+	// Initialize configuration manager
 	configManager := config.NewManager()
+	// Load configuration from file
 	if err := configManager.LoadConfig(); err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
+	// Retrieve server configuration
 	cfg := configManager.GetConfig()
+	// Create a new proxy server with the loaded configuration
 	server := proxy.NewServer(&proxy.ServerConfig{
 		Port:          strconv.Itoa(cfg.Server.Port),
 		HostKeyFile:   cfg.Server.HostKey,
@@ -39,6 +42,7 @@ func main() {
 		Config:        configManager,
 	})
 
+	// Start the proxy server
 	if err := server.Start(); err != nil {
 		log.Fatal(err)
 	}

@@ -1,4 +1,3 @@
-// internal/config/config.go
 package config
 
 import (
@@ -15,47 +14,47 @@ const (
 	DefaultHostKey    = "ssh_host_key"
 )
 
-// AuthConfig representa la configuración de autenticación para un endpoint
+// AuthConfig represents the authentication configuration for an endpoint
 type AuthConfig struct {
 	User    string   `json:"user"`
 	Methods []string `json:"methods"`
 }
 
-// EndpointConfig representa la configuración de un endpoint
+// EndpointConfig represents the configuration of an endpoint
 type EndpointConfig struct {
 	Target string     `json:"target"`
 	Auth   AuthConfig `json:"auth"`
 }
 
-// ServerConfig representa la configuración del servidor
+// ServerConfig represents the server configuration
 type ServerConfig struct {
 	Port            int    `json:"port"`
 	HostKey         string `json:"host_key"`
 	DefaultEndpoint string `json:"default_endpoint,omitempty"`
 }
 
-// Config representa la configuración completa
+// Config represents the complete configuration
 type Config struct {
 	Server    ServerConfig              `json:"server"`
 	Endpoints map[string]EndpointConfig `json:"endpoints,omitempty"`
 }
 
-// Manager gestiona la configuración
+// Manager manages the configuration
 type Manager struct {
 	configFile string
 	config     *Config
 }
 
-// NewManager crea una nueva instancia del gestor de configuración
+// NewManager creates a new configuration manager instance
 func NewManager() *Manager {
 	return &Manager{
 		configFile: getConfigPath(),
 	}
 }
 
-// getConfigPath obtiene la ruta del archivo de configuración
+// getConfigPath gets the path of the configuration file
 func getConfigPath() string {
-	// Comprobar flag de línea de comandos
+	// Check command line flag
 	configPath := flag.String("config", "", "path to config file")
 	flag.Parse()
 
@@ -63,16 +62,16 @@ func getConfigPath() string {
 		return *configPath
 	}
 
-	// Comprobar variable de entorno
+	// Check environment variable
 	if envPath := os.Getenv("CONFIG_FILE"); envPath != "" {
 		return envPath
 	}
 
-	// Usar valor por defecto
+	// Use default value
 	return DefaultConfigFile
 }
 
-// createDefaultConfig crea un archivo de configuración por defecto
+// createDefaultConfig creates a default configuration file
 func createDefaultConfig() *Config {
 	return &Config{
 		Server: ServerConfig{
@@ -82,32 +81,32 @@ func createDefaultConfig() *Config {
 	}
 }
 
-// LoadConfig carga la configuración desde el archivo
+// LoadConfig loads the configuration from the file
 func (m *Manager) LoadConfig() error {
-	// Verificar si el archivo existe
+	// Check if the file exists
 	if _, err := os.Stat(m.configFile); os.IsNotExist(err) {
-		// Crear configuración por defecto
+		// Create default configuration
 		m.config = createDefaultConfig()
-		// Guardar configuración por defecto
+		// Save default configuration
 		if err := m.SaveConfig(); err != nil {
 			return fmt.Errorf("failed to create default config: %v", err)
 		}
 		return nil
 	}
 
-	// Leer archivo de configuración
+	// Read configuration file
 	data, err := os.ReadFile(m.configFile)
 	if err != nil {
 		return fmt.Errorf("failed to read config file: %v", err)
 	}
 
-	// Decodificar JSON
+	// Decode JSON
 	m.config = &Config{}
 	if err := json.Unmarshal(data, m.config); err != nil {
 		return fmt.Errorf("failed to parse config file: %v", err)
 	}
 
-	// Validar configuración
+	// Validate configuration
 	if err := m.validateConfig(); err != nil {
 		return fmt.Errorf("invalid configuration: %v", err)
 	}
@@ -115,21 +114,21 @@ func (m *Manager) LoadConfig() error {
 	return nil
 }
 
-// SaveConfig guarda la configuración en el archivo
+// SaveConfig saves the configuration to the file
 func (m *Manager) SaveConfig() error {
-	// Crear directorio si no existe
+	// Create directory if it does not exist
 	dir := filepath.Dir(m.configFile)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("failed to create config directory: %v", err)
 	}
 
-	// Codificar JSON
+	// Encode JSON
 	data, err := json.MarshalIndent(m.config, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to encode config: %v", err)
 	}
 
-	// Escribir archivo
+	// Write file
 	if err := os.WriteFile(m.configFile, data, 0644); err != nil {
 		return fmt.Errorf("failed to write config file: %v", err)
 	}
@@ -137,28 +136,28 @@ func (m *Manager) SaveConfig() error {
 	return nil
 }
 
-// validateConfig valida la configuración
+// validateConfig validates the configuration
 func (m *Manager) validateConfig() error {
-	// Validar puerto
+	// Validate port
 	if m.config.Server.Port <= 0 || m.config.Server.Port > 65535 {
 		return fmt.Errorf("invalid port number: %d", m.config.Server.Port)
 	}
 
-	// Validar host key
+	// Validate host key
 	if m.config.Server.HostKey == "" {
 		return fmt.Errorf("host key file path is required")
 	}
 
-	// Validar endpoints
+	// Validate endpoints
 	if m.config.Endpoints != nil {
-		// Validar default endpoint
+		// Validate default endpoint
 		if m.config.Server.DefaultEndpoint != "" {
 			if _, exists := m.config.Endpoints[m.config.Server.DefaultEndpoint]; !exists {
 				return fmt.Errorf("default endpoint '%s' not found", m.config.Server.DefaultEndpoint)
 			}
 		}
 
-		// Validar cada endpoint
+		// Validate each endpoint
 		validMethods := map[string]bool{
 			"password": true,
 			"none":     true,
@@ -184,12 +183,12 @@ func (m *Manager) validateConfig() error {
 	return nil
 }
 
-// GetConfig devuelve la configuración actual
+// GetConfig returns the current configuration
 func (m *Manager) GetConfig() *Config {
 	return m.config
 }
 
-// GetEndpoint obtiene la configuración de un endpoint específico
+// GetEndpoint gets the configuration of a specific endpoint
 func (m *Manager) GetEndpoint(name string) (*EndpointConfig, error) {
 	if m.config.Endpoints == nil {
 		return nil, fmt.Errorf("no endpoints configured")

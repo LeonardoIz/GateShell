@@ -1,4 +1,3 @@
-// internal/proxy/router.go
 package proxy
 
 import (
@@ -18,6 +17,7 @@ type Router struct {
 }
 
 func NewRouter(config *config.Manager) *Router {
+	// Create a new Router with the given configuration
 	return &Router{
 		authenticator: auth.NewAuthenticator(&auth.AuthConfig{}),
 		config:        config,
@@ -25,6 +25,7 @@ func NewRouter(config *config.Manager) *Router {
 }
 
 func (r *Router) connectToUpstream(username, password string) (*ssh.Client, error) {
+	// Connect to the upstream SSH server
 	endpoint, err := r.config.GetEndpoint(username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get endpoint configuration: %v", err)
@@ -41,6 +42,7 @@ func (r *Router) connectToUpstream(username, password string) (*ssh.Client, erro
 }
 
 func (r *Router) handleChannels(chans <-chan ssh.NewChannel, upstreamClient *ssh.Client) {
+	// Handle SSH channels for session forwarding
 	for newChannel := range chans {
 		if newChannel.ChannelType() != "session" {
 			newChannel.Reject(ssh.UnknownChannelType, "unknown channel type")
@@ -86,6 +88,7 @@ func (r *Router) handleChannels(chans <-chan ssh.NewChannel, upstreamClient *ssh
 }
 
 func (r *Router) HandleConnection(conn *ssh.ServerConn, chans <-chan ssh.NewChannel, reqs <-chan *ssh.Request, username, password string) {
+	// Handle SSH connection and forward to upstream
 	upstreamClient, err := r.connectToUpstream(username, password)
 	if err != nil {
 		log.Printf("Failed to connect to upstream server: %v\n", err)

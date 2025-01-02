@@ -1,4 +1,3 @@
-// internal/proxy/server.go
 package proxy
 
 import (
@@ -28,6 +27,7 @@ type Server struct {
 }
 
 func NewServer(config *ServerConfig) *Server {
+	// Create a new Server with the given configuration
 	return &Server{
 		config: config,
 		router: NewRouter(config.Config),
@@ -39,12 +39,14 @@ func NewServer(config *ServerConfig) *Server {
 }
 
 func (s *Server) setupSSHConfig() error {
+	// Setup SSH server configuration
 	var err error
 	s.sshConfig, err = s.authenticator.ConfigureServer()
 	return err
 }
 
 func (s *Server) handleConnection(nConn net.Conn) {
+	// Handle new incoming SSH connection
 	conn, chans, reqs, err := ssh.NewServerConn(nConn, s.sshConfig)
 	if err != nil {
 		log.Printf("Failed to establish SSH connection: %v\n", err)
@@ -59,6 +61,7 @@ func (s *Server) handleConnection(nConn net.Conn) {
 }
 
 func (s *Server) Start() error {
+	// Start the SSH server
 	if err := s.setupSSHConfig(); err != nil {
 		return fmt.Errorf("failed to setup SSH config: %v", err)
 	}
