@@ -47,35 +47,21 @@ Example:
 
 ## How to Run
 
-1. Clone the repository:
+1. Clone and build the repository:
 
     ```sh
     git clone https://github.com/LeonardoIz/GateShell.git
     cd GateShell
-    ```
-
-2. Build the project:
-
-    ```sh
     go build -o gateshell cmd/gateshell
     ```
 
-3. Create a configuration file `config.json` in the root directory. Use the example configuration file structure provided above.
+2. Create a configuration file `config.json` in the root directory. Use the example configuration file structure provided above.
 
-4. Run the GateShell server:
+3. Run the GateShell server:
 
     ```sh
     ./gateshell -config config.json
     ```
-
-### Environment Variables
-
-You can also use environment variables to specify the configuration file path:
-
-```sh
-export CONFIG_FILE=path/to/config.json
-./gateshell
-```
 
 ## Contributing
 
