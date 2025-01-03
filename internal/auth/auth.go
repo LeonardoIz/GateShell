@@ -51,7 +51,7 @@ func (a *Authenticator) GetUpstreamConfig(username, password string) *ssh.Client
 	return &ssh.ClientConfig{
 		User: username,
 		Auth: []ssh.AuthMethod{
-			ssh.Password(password),
+			PasswordAuthMethod(password),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
