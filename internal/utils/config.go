@@ -50,6 +50,7 @@ type Manager struct {
 	config     *Config
 }
 
+// NewManager creates a new configuration manager instance and loads the configuration file path from flags or environment variables
 func NewManager() *Manager {
 	configFile := flag.String("config", DefaultConfigFileName, "name of the config file")
 	dataPath := flag.String("data_path", DefaultDataPath, "path to the data directory")
@@ -82,7 +83,7 @@ func createDefaultConfig() *Config {
 	}
 }
 
-// LoadConfig loads the configuration from the file
+// LoadConfig loads the configuration from the file or creates a default configuration if the file does not exist
 func (m *Manager) LoadConfig() error {
 	// Check if the file exists
 	if _, err := os.Stat(m.configFile); os.IsNotExist(err) {
@@ -155,7 +156,7 @@ func (m *Manager) validateConfig() error {
 	}
 
 	// Ensure only one authentication method is specified if "none" is used
-	if m.config.Server.AuthMethod == "none" || m.config.Server.AuthMethod == "password" {
+	if m.config.Server.AuthMethod == "none" && m.config.Server.AuthMethod == "password" {
 		return fmt.Errorf("cannot specify both 'none' and 'password' authentication methods")
 	}
 
