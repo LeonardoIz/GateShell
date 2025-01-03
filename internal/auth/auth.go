@@ -9,6 +9,7 @@ import (
 type AuthConfig struct {
 	ServerVersion string
 	HostKeyFile   string
+	AuthMethod    string
 }
 
 type Authenticator struct {
@@ -47,11 +48,21 @@ func (a *Authenticator) ConfigureServer() (*ssh.ServerConfig, error) {
 }
 
 func (a *Authenticator) GetUpstreamConfig(username, password string) *ssh.ClientConfig {
-	// Get SSH client configuration for upstream connection
+	var authMethod ssh.AuthMethod
+
+	switch a.config.AuthMethod {
+	case "none":
+		authMethod = NoneAuthMethod()
+	case "password":
+		authMethod = PasswordAuthMethod(password)
+	default:
+		authMethod = PasswordAuthMethod(password)
+	}
+
 	return &ssh.ClientConfig{
 		User: username,
 		Auth: []ssh.AuthMethod{
-			PasswordAuthMethod(password),
+			authMethod,
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}

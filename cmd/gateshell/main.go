@@ -49,6 +49,7 @@ func main() {
 		ServerName:    serverName,
 		ServerVersion: serverVersion,
 		Config:        configManager,
+		AuthMethod:    cfg.Server.AuthMethod,
 	})
 
 	if err := server.Start(); err != nil {

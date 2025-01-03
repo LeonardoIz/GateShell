@@ -17,6 +17,7 @@ type ServerConfig struct {
 	ServerName    string
 	ServerVersion string
 	Config        *utils.Manager
+	AuthMethod    string // Añadir este campo
 }
 
 type Server struct {
@@ -33,6 +34,7 @@ func NewServer(config *ServerConfig) *Server {
 		authenticator: auth.NewAuthenticator(&auth.AuthConfig{
 			ServerVersion: fmt.Sprintf("SSH-2.0-%s-%s", config.ServerName, config.ServerVersion),
 			HostKeyFile:   config.HostKeyFile,
+			AuthMethod:    config.AuthMethod, // Añadir este campo
 		}),
 	}
 }

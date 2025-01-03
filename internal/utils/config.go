@@ -12,6 +12,7 @@ const (
 	DefaultPort       = 22
 	DefaultHostKey    = "ssh_host_key"
 	DefaultLogDir     = "logs"
+	DefaultAuthMethod = "password"
 )
 
 // AuthConfig represents the authentication configuration for an endpoint
@@ -32,6 +33,7 @@ type ServerConfig struct {
 	HostKey         string `json:"host_key"`
 	DefaultEndpoint string `json:"default_endpoint,omitempty"`
 	LogDir          string `json:"log_dir"`
+	AuthMethod      string `json:"auth_method"`
 }
 
 // Config represents the complete configuration
@@ -57,9 +59,10 @@ func NewManager(configFile string) *Manager {
 func createDefaultConfig() *Config {
 	return &Config{
 		Server: ServerConfig{
-			Port:    DefaultPort,
-			HostKey: DefaultHostKey,
-			LogDir:  DefaultLogDir,
+			Port:       DefaultPort,
+			HostKey:    DefaultHostKey,
+			LogDir:     DefaultLogDir,
+			AuthMethod: DefaultAuthMethod,
 		},
 	}
 }
@@ -134,6 +137,11 @@ func (m *Manager) validateConfig() error {
 	// Validate log directory
 	if m.config.Server.LogDir == "" {
 		return fmt.Errorf("log directory path is required")
+	}
+
+	// Ensure only one authentication method is specified if "none" is used
+	if m.config.Server.AuthMethod == "none" && m.config.Server.AuthMethod == "password" {
+		return fmt.Errorf("cannot specify both 'none' and 'password' authentication methods")
 	}
 
 	// Validate endpoints
