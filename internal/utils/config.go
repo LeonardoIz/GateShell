@@ -2,17 +2,19 @@ package utils
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 )
 
 const (
-	DefaultConfigFile = "config.json"
-	DefaultPort       = 22
-	DefaultHostKey    = "ssh_host_key"
-	DefaultLogDir     = "logs"
-	DefaultAuthMethod = "password"
+	DefaultConfigFileName = "config.json"
+	DefaultDataPath       = "data"
+	DefaultPort           = 22
+	DefaultHostKey        = "ssh_host_key"
+	DefaultLogDir         = "logs"
+	DefaultAuthMethod     = "password"
 )
 
 // AuthConfig represents the authentication configuration for an endpoint
@@ -48,10 +50,23 @@ type Manager struct {
 	config     *Config
 }
 
-// NewManager creates a new configuration manager instance with the given config file path
-func NewManager(configFile string) *Manager {
+func NewManager() *Manager {
+	configFile := flag.String("config", DefaultConfigFileName, "name of the config file")
+	dataPath := flag.String("data_path", DefaultDataPath, "path to the data directory")
+	flag.Parse()
+
+	if envConfigFile := os.Getenv("CONFIG_FILE"); envConfigFile != "" {
+		*configFile = envConfigFile
+	}
+
+	if envDataPath := os.Getenv("DATA_PATH"); envDataPath != "" {
+		*dataPath = envDataPath
+	}
+
+	configFilePath := filepath.Join(*dataPath, *configFile)
+
 	return &Manager{
-		configFile: configFile,
+		configFile: configFilePath,
 	}
 }
 
@@ -140,7 +155,7 @@ func (m *Manager) validateConfig() error {
 	}
 
 	// Ensure only one authentication method is specified if "none" is used
-	if m.config.Server.AuthMethod == "none" && m.config.Server.AuthMethod == "password" {
+	if m.config.Server.AuthMethod == "none" || m.config.Server.AuthMethod == "password" {
 		return fmt.Errorf("cannot specify both 'none' and 'password' authentication methods")
 	}
 

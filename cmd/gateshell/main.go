@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"gateshell/internal/proxy"
 	"gateshell/internal/utils"
@@ -26,12 +25,8 @@ func PrintBanner() {
 func main() {
 	PrintBanner()
 
-	// Define the config file path flag
-	configFilePath := flag.String("config", "data/config.json", "path to the config file")
-	flag.Parse()
-
-	// Initialize configuration manager with the config file path
-	configManager := utils.NewManager(*configFilePath)
+	// Initialize configuration manager
+	configManager := utils.NewManager()
 	if err := configManager.LoadConfig(); err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
